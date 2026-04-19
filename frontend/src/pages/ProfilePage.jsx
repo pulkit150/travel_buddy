@@ -6,6 +6,8 @@ import api from '../services/api';
 import TrustBadge from '../components/TrustBadge';
 import StarRating from '../components/StarRating';
 import TripCard from '../components/TripCard';
+// Add this import at the top (line 4)
+import { getImageUrl } from '../services/api';
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -31,7 +33,7 @@ export default function ProfilePage() {
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
           {/* Avatar */}
           {user.profileImage ? (
-            <img src={user.profileImage} className="w-24 h-24 rounded-2xl object-cover border-4 border-ocean-100" alt="avatar" />
+            <img src={getImageUrl(user.profileImage)} className="w-24 h-24 rounded-2xl object-cover border-4 border-ocean-100" alt="avatar" />
           ) : (
             <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-ocean-400 to-ocean-600 flex items-center justify-center text-white font-bold text-3xl">
               {user.name?.[0]}
@@ -118,7 +120,7 @@ export default function ProfilePage() {
               <div key={review._id} className="card p-5">
                 <div className="flex items-center gap-3 mb-2">
                   {review.fromUser?.profileImage ? (
-                    <img src={review.fromUser.profileImage} className="w-9 h-9 rounded-full object-cover" alt="" />
+                    <img src={getImageUrl(review.fromUser?.profileImage)} className="w-9 h-9 rounded-full object-cover" alt="" />
                   ) : (
                     <div className="w-9 h-9 rounded-full bg-ocean-100 flex items-center justify-center font-bold text-ocean-700 text-sm">
                       {review.fromUser?.name?.[0]}

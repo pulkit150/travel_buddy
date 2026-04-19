@@ -13,7 +13,19 @@ const {
 } = require('../controllers/userController');
 
 router.get('/me', protect, getMyProfile);
-router.put('/me', protect, uploadProfile.single('profileImage'), updateMyProfile);
+
+// Wrap multer in a custom middleware so errors don't crash the server
+router.put('/me', protect, (req, res, next) => {
+  uploadProfile.single('profileImage')(req, res, (err) => {
+    if (err) {
+      console.error('Multer error:', err.message);
+      // If multer fails (e.g. wrong file type), still try to update without the image
+      req.file = null;
+    }
+    next();
+  });
+}, updateMyProfile);
+
 router.get('/matches', protect, getMatchedTrips);
 router.get('/notifications', protect, getNotifications);
 router.put('/notifications/read', protect, markNotificationsRead);

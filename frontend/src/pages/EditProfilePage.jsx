@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import { getImageUrl } from '../services/api';
 
 const INTEREST_OPTIONS = ['Hiking', 'Beach', 'Photography', 'Food', 'Culture', 'Adventure', 'Backpacking', 'Luxury', 'Wildlife', 'History', 'Nightlife', 'Road Trip'];
 
@@ -17,7 +18,7 @@ export default function EditProfilePage() {
     travelPreferences: user?.travelPreferences || { style: 'mid-range', groupSize: 'small' },
   });
   const [imageFile, setImageFile] = useState(null);
-  const [preview, setPreview] = useState(user?.profileImage || '');
+  const [preview, setPreview] = useState(getImageUrl(user?.profileImage) || '');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');

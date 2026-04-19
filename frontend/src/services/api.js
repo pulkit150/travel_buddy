@@ -1,20 +1,16 @@
-// src/services/api.js - Axios instance with auth interceptor
+// src/services/api.js
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api', // Proxied to backend via Vite config
+  baseURL: '/api',
 });
 
-// Automatically attach JWT token to every request
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-// Handle 401 errors globally (expired token, etc.)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -25,5 +21,14 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// Helper: converts a stored image path to a full URL
+// Local disk images are stored as "/uploads/filename.jpg"
+// Cloudinary images are already full "https://..." URLs
+export const getImageUrl = (path) => {
+  if (!path) return '';
+  if (path.startsWith('http')) return path;           // Cloudinary
+  return `http://localhost:5000${path}`;              // Local disk
+};
 
 export default api;

@@ -1,6 +1,8 @@
 // src/components/TripCard.jsx - Card shown in trip feed
 import { Link } from 'react-router-dom';
 import TrustBadge from './TrustBadge';
+import { getImageUrl } from '../services/api';
+
 
 export default function TripCard({ trip }) {
   const { _id, destination, description, startDate, endDate, budget, maxMembers, members, image, creator, status } = trip;
@@ -47,7 +49,7 @@ export default function TripCard({ trip }) {
         {creator && (
           <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100">
             {creator.profileImage ? (
-              <img src={creator.profileImage} className="w-7 h-7 rounded-full object-cover" alt={creator.name} />
+              <img src={getImageUrl(creator.profileImage)} className="w-7 h-7 rounded-full object-cover" alt={creator.name} />
             ) : (
               <div className="w-7 h-7 rounded-full bg-ocean-100 flex items-center justify-center text-xs font-bold text-ocean-700">
                 {creator.name?.[0]}

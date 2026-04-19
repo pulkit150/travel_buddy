@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import { useState } from 'react';
 import TrustBadge from './TrustBadge';
+import { getImageUrl } from '../services/api';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -81,7 +82,7 @@ export default function Navbar() {
                 <div className="relative">
                   <button onClick={() => setMenuOpen(!menuOpen)} className="flex items-center gap-2">
                     {user.profileImage ? (
-                      <img src={user.profileImage} alt="avatar" className="w-9 h-9 rounded-full object-cover border-2 border-ocean-200" />
+                      <img src={getImageUrl(user.profileImage)} alt="avatar" className="w-9 h-9 rounded-full object-cover border-2 border-ocean-200" />
                     ) : (
                       <div className="w-9 h-9 rounded-full bg-ocean-100 flex items-center justify-center text-ocean-700 font-bold text-sm">
                         {user.name?.[0]?.toUpperCase()}
