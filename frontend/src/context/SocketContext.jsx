@@ -18,8 +18,8 @@ export function SocketProvider({ children }) {
       socketRef.current.disconnect();
     }
 
-    const socket = io('http://localhost:5000', {
-      transports: ['polling', 'websocket'], // polling first, upgrades cleanly
+    const socket = io(import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000', {
+      transports: ['polling', 'websocket'],
     });
     socketRef.current = socket;
 
