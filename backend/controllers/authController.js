@@ -47,8 +47,9 @@ const signup = async (req, res) => {
     // Try to send OTP email — if email isn't configured, app still works (check terminal)
     try {
       await sendOTPEmail(email, otp);
+      console.log(`OTP email sent to ${email}`);
     } catch (emailError) {
-      console.warn('Email sending failed (check .env EMAIL settings). OTP is logged above.');
+      console.error('❌ Email failed:', emailError.message);.');
     }
 
     res.status(201).json({
@@ -115,8 +116,16 @@ const resendOTP = async (req, res) => {
     user.otpExpires = new Date(Date.now() + 10 * 60 * 1000);
     await user.save();
 
-    await sendOTPEmail(user.email, otp);
-    res.json({ message: 'OTP resent to your email' });
+    console.log(`OTP for ${user.email}: ${otp}`); // check Render logs
+
+    try {
+      await sendOTPEmail(user.email, otp);
+      console.log('✅ Email sent to', user.email);
+    } catch (emailError) {
+      console.error('❌ Email failed:', emailError.message);
+    }
+
+    res.json({ message: 'OTP sent! Check your email or Render logs.' });
   } catch (error) {
     res.status(500).json({ message: 'Failed to resend OTP', error: error.message });
   }
