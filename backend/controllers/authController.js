@@ -16,21 +16,17 @@ const signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'Email already registered' });
     }
 
-    // Hash the password before saving
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Generate OTP (valid for 10 minutes)
     const otp = generateOTP();
-    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
 
-    // Create user (not verified yet)
     const user = await User.create({
       name,
       email,
@@ -39,17 +35,16 @@ const signup = async (req, res) => {
       otpExpires,
     });
 
-    // Always log OTP to terminal (useful in development when email isn't configured)
+    // Always log OTP to backend terminal
     console.log(`\n=============================`);
     console.log(`OTP for ${email}: ${otp}`);
     console.log(`=============================\n`);
 
-    // Try to send OTP email — if email isn't configured, app still works (check terminal)
     try {
       await sendOTPEmail(email, otp);
-      console.log(`OTP email sent to ${email}`);
+      console.log('✅ Email sent to', email);
     } catch (emailError) {
-      console.error('❌ Email failed:', emailError.message);.');
+      console.error('❌ Email failed:', emailError.message);
     }
 
     res.status(201).json({
