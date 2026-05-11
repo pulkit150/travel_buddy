@@ -1,6 +1,6 @@
-// server.js - FIXED
+// server.js - top, replace dotenv and cors section
 const dotenv = require('dotenv');
-dotenv.config(); 
+dotenv.config();
 
 const express = require('express');
 const http = require('http');
@@ -17,31 +17,22 @@ const reviewRoutes = require('./routes/reviewRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const { setupSocket } = require('./utils/socket');
 
-// Connect to MongoDB
 connectDB();
 
 const app = express();
 const httpServer = http.createServer(app);
 
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  'http://localhost:5173',
-].filter(Boolean);
-
+// ✅ Allow all origins temporarily to fix CORS
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) callback(null, true);
-    else callback(new Error('Not allowed by CORS'));
-  },
-  credentials: true,
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-// same for socket.io
 const io = new Server(httpServer, {
   cors: {
-    origin: allowedOrigins,
+    origin: '*',
     methods: ['GET', 'POST'],
-    credentials: true,
   },
 });
 
