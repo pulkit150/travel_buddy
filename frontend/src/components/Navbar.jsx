@@ -13,7 +13,13 @@ export default function Navbar() {
   const [showNotifs, setShowNotifs] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const unread = notifications.filter(n => !n.isRead).length;
+  // Count unread — all incoming socket notifications start as unread
+  const unreadCount = notifications.filter(n => !n.isRead).length;
+
+  const handleBellClick = () => {
+    setShowNotifs(!showNotifs);
+    // Don't clear — just show them. User can see them.
+  };
 
   const handleLogout = () => {
     logout();
@@ -44,33 +50,56 @@ export default function Navbar() {
                   + Create Trip
                 </Link>
 
-                {/* Notifications bell */}
+                {/* Notification Bell */}
                 <div className="relative">
                   <button
-                    onClick={() => { setShowNotifs(!showNotifs); clearNotifications(); }}
+                    onClick={handleBellClick}
                     className="relative p-2 text-slate-500 hover:text-ocean-600 transition-colors"
                   >
                     🔔
-                    {unread > 0 && (
-                      <span className="absolute top-0 right-0 bg-coral-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">
-                        {unread}
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 bg-coral-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                        {unreadCount > 9 ? '9+' : unreadCount}
                       </span>
                     )}
                   </button>
+
+                  {/* Dropdown */}
                   {showNotifs && (
                     <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-100 z-50 max-h-96 overflow-y-auto">
-                      <div className="p-3 border-b border-slate-100 font-semibold text-sm text-slate-700">Notifications</div>
+                      <div className="flex items-center justify-between p-3 border-b border-slate-100">
+                        <span className="font-semibold text-sm text-slate-700">Notifications</span>
+                        {notifications.length > 0 && (
+                          <button
+                            onClick={clearNotifications}
+                            className="text-xs text-ocean-600 hover:underline"
+                          >
+                            Clear all
+                          </button>
+                        )}
+                      </div>
+
                       {notifications.length === 0 ? (
-                        <p className="p-4 text-sm text-slate-400 text-center">No new notifications</p>
+                        <div className="p-6 text-center">
+                          <p className="text-2xl mb-1">🔔</p>
+                          <p className="text-sm text-slate-400">No notifications yet</p>
+                        </div>
                       ) : (
                         notifications.map((n, i) => (
-                          <div key={i} className="px-4 py-3 border-b border-slate-50 hover:bg-slate-50">
+                          <div
+                            key={i}
+                            className={`px-4 py-3 border-b border-slate-50 hover:bg-slate-50 transition-colors ${!n.isRead ? 'bg-ocean-50/50' : ''}`}
+                          >
                             <p className="text-sm text-slate-700">{n.message}</p>
                             <span className={`text-xs mt-1 inline-block px-2 py-0.5 rounded-full font-medium ${
                               n.type === 'accepted' ? 'bg-green-100 text-green-700' :
                               n.type === 'rejected' ? 'bg-red-100 text-red-700' :
                               'bg-ocean-100 text-ocean-700'
-                            }`}>{n.type}</span>
+                            }`}>
+                              {n.type === 'request' ? '🙋 Join Request' :
+                               n.type === 'accepted' ? '✅ Accepted' :
+                               n.type === 'rejected' ? '❌ Rejected' : n.type}
+                            </span>
                           </div>
                         ))
                       )}
@@ -78,7 +107,7 @@ export default function Navbar() {
                   )}
                 </div>
 
-                {/* Avatar dropdown */}
+                {/* Avatar + dropdown */}
                 <div className="relative">
                   <button onClick={() => setMenuOpen(!menuOpen)} className="flex items-center gap-2">
                     {user.profileImage ? (
@@ -100,6 +129,7 @@ export default function Navbar() {
                 </div>
               </>
             )}
+
             {!user && (
               <>
                 <Link to="/login" className="text-slate-600 hover:text-ocean-600 font-medium text-sm">Login</Link>

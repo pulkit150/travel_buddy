@@ -1,4 +1,4 @@
-// models/Trip.js - Trip database schema
+// models/Trip.js
 const mongoose = require('mongoose');
 
 const tripSchema = new mongoose.Schema(
@@ -8,63 +8,29 @@ const tripSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
-    destination: {
-      type: String,
-      required: [true, 'Destination is required'],
-      trim: true,
-    },
-    description: {
-      type: String,
-      required: [true, 'Description is required'],
-    },
-    startDate: {
-      type: Date,
-      required: [true, 'Start date is required'],
-    },
-    endDate: {
-      type: Date,
-      required: [true, 'End date is required'],
-    },
-    budget: {
-      type: Number,
-      required: [true, 'Budget is required'],
-    },
-    maxMembers: {
-      type: Number,
-      required: [true, 'Max members is required'],
-      min: 2,
-    },
-    image: {
-      type: String,
-      default: '',
-    },
-
-    // Status of the trip
+    destination: { type: String, required: true, trim: true },
+    description: { type: String, required: true },
+    startDate: { type: Date, required: true },
+    endDate: { type: Date, required: true },
+    budget: { type: Number, required: true },
+    maxMembers: { type: Number, required: true, min: 2 },
+    image: { type: String, default: '' },
     status: {
       type: String,
       enum: ['open', 'full', 'completed', 'cancelled'],
       default: 'open',
     },
-
-    // Members who have joined (approved)
-    members: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-      },
-    ],
-
-    // Users who have requested to join (pending approval)
+    members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     pendingRequests: [
       {
         user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-        message: String, // Optional message when requesting to join
+        message: String,
         requestedAt: { type: Date, default: Date.now },
       },
     ],
-
-    // Tags for better matching
-    tags: [String], // e.g. ['beach', 'adventure', 'cultural']
+    // ✅ NEW — track rejected users so they can't re-request
+    rejectedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    tags: [String],
   },
   { timestamps: true }
 );

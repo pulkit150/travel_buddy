@@ -1,8 +1,10 @@
-// server.js - Main entry point for the Travel Buddy API
+// server.js - FIXED
+const dotenv = require('dotenv');
+dotenv.config(); 
+
 const express = require('express');
 const http = require('http');
 const cors = require('cors');
-const dotenv = require('dotenv');
 const path = require('path');
 const { Server } = require('socket.io');
 
@@ -13,10 +15,7 @@ const tripRoutes = require('./routes/tripRoutes');
 const requestRoutes = require('./routes/requestRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const messageRoutes = require('./routes/messageRoutes');
-const setupSocket = require('./utils/socket');
-
-// Load environment variables
-dotenv.config();
+const { setupSocket } = require('./utils/socket');
 
 // Connect to MongoDB
 connectDB();
@@ -24,7 +23,6 @@ connectDB();
 const app = express();
 const httpServer = http.createServer(app);
 
-// Set up Socket.io with CORS
 const io = new Server(httpServer, {
   cors: {
     origin: process.env.FRONTEND_URL || 'http://localhost:5173',
@@ -32,20 +30,15 @@ const io = new Server(httpServer, {
   },
 });
 
-// Middleware
 app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5173' }));
-app.use(express.json()); // Parse JSON request bodies
-
-// Serve locally uploaded images (used when Cloudinary is not configured)
+app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Attach io to every request so controllers can emit events
 app.use((req, res, next) => {
   req.io = io;
   next();
 });
 
-// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/trips', tripRoutes);
@@ -53,15 +46,9 @@ app.use('/api/requests', requestRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/messages', messageRoutes);
 
-// Health check endpoint
-app.get('/', (req, res) => {
-  res.json({ message: 'Travel Buddy API is running!' });
-});
+app.get('/', (req, res) => res.json({ message: 'Travel Buddy API is running!' }));
 
-// Set up all Socket.io event handlers
 setupSocket(io);
 
 const PORT = process.env.PORT || 5000;
-httpServer.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+httpServer.listen(PORT, () => console.log(`Server running on port ${PORT}`));

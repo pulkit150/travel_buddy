@@ -1,71 +1,47 @@
-// models/User.js - User database schema
+// models/User.js
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: [true, 'Name is required'],
-      trim: true,
-    },
-    email: {
-      type: String,
-      required: [true, 'Email is required'],
-      unique: true,
-      lowercase: true,
-    },
-    password: {
-      type: String,
-      required: [true, 'Password is required'],
-      minlength: 6,
-    },
-    // OTP for email verification
+    name: { type: String, required: true, trim: true },
+    email: { type: String, required: true, unique: true, lowercase: true },
+    password: { type: String, required: true, minlength: 6 },
+
+    // OTP verification
     otp: String,
     otpExpires: Date,
-    isVerified: {
-      type: Boolean,
-      default: false,
-    },
+    isVerified: { type: Boolean, default: false },
 
-    // Profile fields
+    // Profile
     age: Number,
     bio: String,
-    profileImage: {
-      type: String,
-      default: '',
-    },
-    interests: [String], // e.g. ['hiking', 'photography', 'food']
+    profileImage: { type: String, default: '' },
+    interests: [String],
     travelPreferences: {
       style: { type: String, enum: ['budget', 'mid-range', 'luxury'], default: 'mid-range' },
       groupSize: { type: String, enum: ['solo', 'small', 'large'], default: 'small' },
     },
 
-    // Trust Score System
-    // Starts at 50, changes based on behavior
-    trustScore: {
-      type: Number,
-      default: 50,
-      min: 0,
-      max: 100,
-    },
+    // Trust Score
+    trustScore: { type: Number, default: 50, min: 0, max: 100 },
 
-    // Activity tracking
+    // Activity
     tripsCompleted: { type: Number, default: 0 },
     tripsCancelled: { type: Number, default: 0 },
     ratingsReceived: [
       {
-        rating: Number, // 1-5
+        rating: Number,
         comment: String,
         fromUser: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
       },
     ],
     averageRating: { type: Number, default: 0 },
 
-    // Notifications
+    // ✅ FIXED — notifications is array of OBJECTS not strings
     notifications: [
       {
-        message: String,
-        type: String, // 'request', 'accepted', 'rejected', 'trip_update'
+        message: { type: String, required: true },
+        type: { type: String, enum: ['request', 'accepted', 'rejected', 'trip_update'] },
         tripId: { type: mongoose.Schema.Types.ObjectId, ref: 'Trip' },
         isRead: { type: Boolean, default: false },
         createdAt: { type: Date, default: Date.now },
